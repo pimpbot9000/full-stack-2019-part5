@@ -45,8 +45,7 @@ const App = () => {
 
   const onLogin = async event => {
     event.preventDefault()
-    console.log('logging in with', username, password)
-
+    
     try {
       const loggedInUser = await loginService.login({
         username, password,
@@ -57,11 +56,9 @@ const App = () => {
       setUsername('')
       setPassword('')
       postsService.setToken(loggedInUser.token)
-      console.log(loggedInUser)
-      console.log(loggedInUser.token)
+
     } catch (exception) {
       showErrorMessage('wrong credentials')
-      console.log('wrong credentials')
     }
   }
 
@@ -69,13 +66,10 @@ const App = () => {
     event.preventDefault()
     window.localStorage.removeItem(loggedInUserKey)
     setUser(null)
-    
-    console.log("logout user")
   }
 
   const onSubmitPost = async event => {
     event.preventDefault()
-    console.log('submit')
     try {
       const response = await postsService.create({ title, url })
       setTitle('')
@@ -83,7 +77,6 @@ const App = () => {
       setPosts(posts.concat(response))
       showNotification(`Post ${response.title} by author ${response.author} added!`)
     } catch (exception) {
-      console.log('failed adding a new post')
       showErrorMessage('Whoopsie. Failed to add post')
     }
   }
