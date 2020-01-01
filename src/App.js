@@ -4,10 +4,30 @@ import postsService from './services/posts'
 
 const App = () => {
 
+  const loggedInUserKey = 'loggedInuser'
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [title, setTitle] = useState('')
+  const [url, setUrl] = useState('')
   const [message, setMessage] = useState(null)
   const [user, setUser] = useState(null)
+  const [posts, setPosts] = useState([])
+
+  useEffect(() => {
+    postsService
+      .getAll().then(posts => {
+        setPosts(posts)
+      })
+  }, [])
+
+  useEffect ( () => {
+    const loggedInUserJSON = window.localStorage.getItem(loggedInUserKey)
+    if(loggedInUserJSON) {
+      const user = JSON.parse(loggedInUserJSON)
+      setUser(user)
+      postsService.setToken(user.token)
+    }
+  }, [])
 
   const showErrorMessage = message => {
     setMessage({ type: "error", content: message })
@@ -24,23 +44,36 @@ const App = () => {
       const loggedInUser = await loginService.login({
         username, password,
       })
+
+      window.localStorage.setItem(loggedInUserKey, JSON.stringify(loggedInUser))
       setUser(loggedInUser)
       setUsername('')
       setPassword('')
       postsService.setToken(loggedInUser.token)
       console.log(loggedInUser)
+      console.log(loggedInUser.token)
     } catch (exception) {
       showErrorMessage('wrong credentials')
-      //setErrorMessage('wrong credentials')
       console.log('wrong credentials')
+    }
+  }
+
+  const onSubmitPost = async event => {
+    event.preventDefault()
+    console.log('submit')
+    try {
+      const response = await postsService.create({ title, url })
+      console.log(response)
+    } catch (exception) {
+      console.log('failed adding a new post')
     }
   }
 
   const loginForm = () =>
     <form onSubmit={handleLogin}>
       <div>
-        username
-          <input
+        <p>Username</p>
+        <input
           type="text"
           value={username}
           name="Username"
@@ -48,14 +81,15 @@ const App = () => {
         />
       </div>
       <div>
-        password
-          <input
+        <p>Password</p>
+        <input
           type="password"
           value={password}
           name="Password"
           onChange={({ target }) => setPassword(target.value)}
         />
       </div>
+      <br />
       <button type="submit">login</button>
     </form>
 
@@ -67,6 +101,13 @@ const App = () => {
         loginForm() :
         <div>
           <p>{user.name} logged in</p>
+          <PostForm
+            title={title}
+            setTitle={setTitle}
+            url={url}
+            setUrl={setUrl}
+            onSubmitPost={onSubmitPost} />
+          <PostList posts={posts} />
         </div>
       }
     </div>
@@ -81,5 +122,34 @@ const Notification = ({ message }) => {
   )
 
 }
+
+const PostList = ({ posts }) => {
+
+  const rows = posts.map(item =>
+    <li key={item.id}>
+      {item.title}, {item.author}
+    </li>
+  )
+
+  return (
+    <ol>
+      {rows}
+    </ol>
+  )
+}
+
+const PostForm = ({ title, setTitle, url, setUrl, onSubmitPost }) =>
+
+  <form onSubmit={onSubmitPost}>
+    <div>
+      <p>Title:</p>
+      <input type="text" value={title} name="title" onChange={({ target }) => setTitle(target.value)} />
+    </div>
+    <div>
+      <p>Url:</p>
+      <input type="text" value={url} name="url" onChange={({ target }) => setUrl(target.value)} />
+    </div>
+    <button type="submit">Save</button>
+  </form>
 
 export default App;
