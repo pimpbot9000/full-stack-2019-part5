@@ -14,15 +14,19 @@ const App = () => {
   const [posts, setPosts] = useState([])
 
   useEffect(() => {
-    postsService
-      .getAll().then(posts => {
-        setPosts(posts)
-      })
-  }, [])
+    console.log(user)
+    if (user) {
+      console.log('load posts')
+      postsService
+        .getAll().then(posts => {
+          setPosts(posts)
+        })
+    }
+  }, [user])
 
-  useEffect ( () => {
+  useEffect(() => {
     const loggedInUserJSON = window.localStorage.getItem(loggedInUserKey)
-    if(loggedInUserJSON) {
+    if (loggedInUserJSON) {
       const user = JSON.parse(loggedInUserJSON)
       setUser(user)
       postsService.setToken(user.token)
@@ -45,7 +49,7 @@ const App = () => {
 
   const onLogin = async event => {
     event.preventDefault()
-    
+
     try {
       const loggedInUser = await loginService.login({
         username, password,
@@ -82,32 +86,35 @@ const App = () => {
   }
 
   const loginForm = () =>
-    <form onSubmit={onLogin}>
-      <div>
-        <p>Username</p>
-        <input
-          type="text"
-          value={username}
-          name="Username"
-          onChange={({ target }) => setUsername(target.value)}
-        />
-      </div>
-      <div>
-        <p>Password</p>
-        <input
-          type="password"
-          value={password}
-          name="Password"
-          onChange={({ target }) => setPassword(target.value)}
-        />
-      </div>
-      <br />
-      <button type="submit">login</button>
-    </form>
+    <div>
+      <h2>Login</h2>
+      <form onSubmit={onLogin}>
+        <div>
+          <p>Username</p>
+          <input
+            type="text"
+            value={username}
+            name="Username"
+            onChange={({ target }) => setUsername(target.value)}
+          />
+        </div>
+        <div>
+          <p>Password</p>
+          <input
+            type="password"
+            value={password}
+            name="Password"
+            onChange={({ target }) => setPassword(target.value)}
+          />
+        </div>
+        <br />
+        <button type="submit">login</button>
+      </form>
+    </div>
 
   return (
     <div className="App">
-      <p>Hello world</p>
+
       <Notification message={message} />
       {user === null ?
         loginForm() :
@@ -151,7 +158,7 @@ const PostList = ({ posts }) => {
 }
 
 const PostForm = ({ title, setTitle, url, setUrl, onSubmitPost }) =>
-  
+
   <form onSubmit={onSubmitPost}>
     <h1>Create new post</h1>
     <div>
