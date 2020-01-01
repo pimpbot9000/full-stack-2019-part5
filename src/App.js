@@ -36,6 +36,13 @@ const App = () => {
     }, 2000)
   }
 
+  const showNotification = message => {
+    setMessage({ type: "notification", content: message })
+    setTimeout(() => {
+      setMessage(null)
+    }, 2000)
+  }
+
   const onLogin = async event => {
     event.preventDefault()
     console.log('logging in with', username, password)
@@ -71,9 +78,13 @@ const App = () => {
     console.log('submit')
     try {
       const response = await postsService.create({ title, url })
-      console.log(response)
+      setTitle('')
+      setUrl('')
+      setPosts(posts.concat(response))
+      showNotification(`Post ${response.title} by author ${response.author} added!`)
     } catch (exception) {
       console.log('failed adding a new post')
+      showErrorMessage('Whoopsie. Failed to add post')
     }
   }
 
