@@ -15,6 +15,11 @@ code {
     monospace;
 }
 
+.togglable{
+  background-color: rgb(202, 204, 204);
+  padding: 10px;
+}
+
 .error {
   color: red;
   background: lightgrey;

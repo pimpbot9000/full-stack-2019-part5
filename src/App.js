@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import loginService from './services/login'
 import postsService from './services/posts'
+import Togglable from './Togglable'
 
 const App = () => {
 
@@ -12,6 +13,8 @@ const App = () => {
   const [message, setMessage] = useState(null)
   const [user, setUser] = useState(null)
   const [posts, setPosts] = useState([])
+
+
 
   useEffect(() => {
     console.log(user)
@@ -62,7 +65,7 @@ const App = () => {
       postsService.setToken(loggedInUser.token)
 
     } catch (exception) {
-      showErrorMessage('wrong credentials')
+      showErrorMessage('Wrong username or passwd')
     }
   }
 
@@ -70,65 +73,67 @@ const App = () => {
     event.preventDefault()
     window.localStorage.removeItem(loggedInUserKey)
     setUser(null)
+    setPosts([])
   }
+
+  const postFormRef = React.createRef()
+
+  const postForm = () => (
+    <Togglable buttonLabel="Create post" ref={postFormRef}>
+      <PostForm
+        title={title}
+        onTitleChanged={({ target }) => setTitle(target.value)}
+        url={url}
+        onUrlChanged={({ target }) => setUrl(target.value)}
+        onSubmitPost={onSubmitPost} />
+    </Togglable>
+  )
 
   const onSubmitPost = async event => {
     event.preventDefault()
+
+    postFormRef.current.toggleVisibility()
     try {
       const response = await postsService.create({ title, url })
       setTitle('')
       setUrl('')
       setPosts(posts.concat(response))
       showNotification(`Post ${response.title} by author ${response.author} added!`)
+
     } catch (exception) {
       showErrorMessage('Whoopsie. Failed to add post')
     }
   }
 
-  const loginForm = () =>
-    <div>
-      <h2>Login</h2>
-      <form onSubmit={onLogin}>
-        <div>
-          <p>Username</p>
-          <input
-            type="text"
-            value={username}
-            name="Username"
-            onChange={({ target }) => setUsername(target.value)}
-          />
-        </div>
-        <div>
-          <p>Password</p>
-          <input
-            type="password"
-            value={password}
-            name="Password"
-            onChange={({ target }) => setPassword(target.value)}
-          />
-        </div>
-        <br />
-        <button type="submit">login</button>
-      </form>
-    </div>
+
+
+
 
   return (
     <div className="App">
 
       <Notification message={message} />
       {user === null ?
-        loginForm() :
+        <div>
+          <Togglable buttonLabel="Show Login">
+            <LoginForm
+              username={username}
+              onUsernameChanged={({ target }) => setUsername(target.value)}
+              password={password}
+              onPasswordChanged={({ target }) => setPassword(target.value)}
+              onLogin={onLogin}
+            />
+          </Togglable>
+        </div>
+
+        : //user not null -> render posts
+
         <div>
           <p>{user.name} logged in <button onClick={onLogout}>logout</button></p>
-          <PostForm
-            title={title}
-            setTitle={setTitle}
-            url={url}
-            setUrl={setUrl}
-            onSubmitPost={onSubmitPost} />
+          {postForm()}
           <PostList posts={posts} />
-        </div>
-      }
+        </div>}
+
     </div>
   )
 }
@@ -157,19 +162,45 @@ const PostList = ({ posts }) => {
   )
 }
 
-const PostForm = ({ title, setTitle, url, setUrl, onSubmitPost }) =>
+const PostForm = ({ title, onTitleChanged, url, onUrlChanged, onSubmitPost }) =>
 
   <form onSubmit={onSubmitPost}>
     <h1>Create new post</h1>
     <div>
       <p>Title:</p>
-      <input type="text" value={title} name="title" onChange={({ target }) => setTitle(target.value)} />
+      <input type="text" value={title} name="title" onChange={onTitleChanged} />
     </div>
     <div>
       <p>Url:</p>
-      <input type="text" value={url} name="url" onChange={({ target }) => setUrl(target.value)} />
+      <input type="text" value={url} name="url" onChange={onUrlChanged} />
     </div>
     <button type="submit">Save</button>
   </form>
 
+const LoginForm = ({ username, onUsernameChanged, password, onPasswordChanged, onLogin }) =>
+  <div>
+    <h2>Login</h2>
+    <form onSubmit={onLogin}>
+      <div>
+        <p>Username</p>
+        <input
+          type="text"
+          value={username}
+          name="Username"
+          onChange={onUsernameChanged}
+        />
+      </div>
+      <div>
+        <p>Password</p>
+        <input
+          type="password"
+          value={password}
+          name="Password"
+          onChange={onPasswordChanged}
+        />
+      </div>
+      <br />
+      <button type="submit">login</button>
+    </form>
+  </div>
 export default App;
