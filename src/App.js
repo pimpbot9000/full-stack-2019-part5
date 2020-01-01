@@ -36,7 +36,7 @@ const App = () => {
     }, 2000)
   }
 
-  const handleLogin = async event => {
+  const onLogin = async event => {
     event.preventDefault()
     console.log('logging in with', username, password)
 
@@ -58,6 +58,14 @@ const App = () => {
     }
   }
 
+  const onLogout = event => {
+    event.preventDefault()
+    window.localStorage.removeItem(loggedInUserKey)
+    setUser(null)
+    
+    console.log("logout user")
+  }
+
   const onSubmitPost = async event => {
     event.preventDefault()
     console.log('submit')
@@ -70,7 +78,7 @@ const App = () => {
   }
 
   const loginForm = () =>
-    <form onSubmit={handleLogin}>
+    <form onSubmit={onLogin}>
       <div>
         <p>Username</p>
         <input
@@ -100,7 +108,7 @@ const App = () => {
       {user === null ?
         loginForm() :
         <div>
-          <p>{user.name} logged in</p>
+          <p>{user.name} logged in <button onClick={onLogout}>logout</button></p>
           <PostForm
             title={title}
             setTitle={setTitle}
@@ -139,8 +147,9 @@ const PostList = ({ posts }) => {
 }
 
 const PostForm = ({ title, setTitle, url, setUrl, onSubmitPost }) =>
-
+  
   <form onSubmit={onSubmitPost}>
+    <h1>Create new post</h1>
     <div>
       <p>Title:</p>
       <input type="text" value={title} name="title" onChange={({ target }) => setTitle(target.value)} />
