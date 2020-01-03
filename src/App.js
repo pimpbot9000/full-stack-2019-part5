@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import loginService from './services/login'
 import postsService from './services/posts'
 import Togglable from './Togglable'
+import TogglableHeader from './TogglableHeader'
 
 const App = () => {
 
@@ -22,7 +23,7 @@ const App = () => {
       console.log('load posts')
       postsService
         .getAll().then(posts => {
-          setPosts(posts)
+          setPosts(posts.sort((a, b) => b.likes - a.likes))
         })
     }
   }, [user])
@@ -85,11 +86,11 @@ const App = () => {
         onTitleChanged={({ target }) => setTitle(target.value)}
         url={url}
         onUrlChanged={({ target }) => setUrl(target.value)}
-        onSubmitPost={onSubmitPost} />
+        onSubmitPost={submitPost} />
     </Togglable>
   )
 
-  const onSubmitPost = async event => {
+  const submitPost = async event => {
     event.preventDefault()
 
     postFormRef.current.toggleVisibility()
@@ -97,6 +98,7 @@ const App = () => {
       const response = await postsService.create({ title, url })
       setTitle('')
       setUrl('')
+      console.log(response)
       setPosts(posts.concat(response))
       showNotification(`Post ${response.title} by author ${response.author} added!`)
 
@@ -105,9 +107,30 @@ const App = () => {
     }
   }
 
+  const deletePost = async (id) => {
+    const ok = window.confirm('Are you sure??')
+    if(!ok) return 
 
+    try {
+      
+      await postsService.remove(id)
+      
+      setPosts(posts.filter(post => post.id !== id))
 
+    } catch(exception) {      
+      showErrorMessage('unable to delete post')
+    }
+    
+  }
 
+  const like = async (id) => {
+    try {
+      const result = await postsService.like(id)
+      setPosts(posts.map(post => post.id !== id ? post : result))
+    } catch (exception) {
+      showErrorMessage('oopsie! Internet did not like you liking')
+    }
+  }
 
   return (
     <div className="App">
@@ -131,7 +154,7 @@ const App = () => {
         <div>
           <p>{user.name} logged in <button onClick={onLogout}>logout</button></p>
           {postForm()}
-          <PostList posts={posts} />
+          <PostList posts={posts} onLike={like} user={user} onDelete={deletePost} />
         </div>}
 
     </div>
@@ -147,18 +170,38 @@ const Notification = ({ message }) => {
 
 }
 
-const PostList = ({ posts }) => {
+const PostList = ({ posts, onLike, onDelete, user }) => {
+
+  const deleteButton = (post, user) => {
+
+    if (user && post.user && user.username === post.user.username) {
+      return <button onClick={() => onDelete(post.id)}>delete me</button>
+    }
+
+    return null
+  }
+
 
   const rows = posts.map(item =>
-    <li key={item.id}>
-      {item.title}, {item.author}
-    </li>
+    <div key={item.id}>
+      <TogglableHeader header={`${item.title} by ${item.author}`}>
+        <p>
+          {item.url} <br />
+          {item.likes} likes <button onClick={() => onLike(item.id)}>Like!</button><br />
+          Author: {item.author}<br />
+          Added by user: {item.user && item.user.username}<br />
+          {deleteButton(item, user)}
+        </p>
+      </TogglableHeader>
+    </div>
   )
 
+
   return (
-    <ol>
+    <div>
+      <h3>Posts</h3>
       {rows}
-    </ol>
+    </div>
   )
 }
 
