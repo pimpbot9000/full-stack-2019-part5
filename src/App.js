@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react'
 import loginService from './services/login'
 import postsService from './services/posts'
 import Togglable from './components/Togglable'
-import TogglableHeader from './components/TogglableHeader'
+import Post from './components/Post'
+import MathBlock from './components/MathBlock'
 
 const App = () => {
 
@@ -15,12 +16,9 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [posts, setPosts] = useState([])
 
-
-
   useEffect(() => {
-    console.log(user)
     if (user) {
-      console.log('load posts')
+
       postsService
         .getAll().then(posts => {
           setPosts(posts.sort((a, b) => b.likes - a.likes))
@@ -98,7 +96,6 @@ const App = () => {
       const response = await postsService.create({ title, url })
       setTitle('')
       setUrl('')
-      console.log(response)
       setPosts(posts.concat(response))
       showNotification(`Post ${response.title} by author ${response.author} added!`)
 
@@ -130,9 +127,10 @@ const App = () => {
     }
   }
 
+  const math = 'f(x) = \\alpha\\cdot 5'
   return (
     <div className="App">
-
+      <MathBlock text={math}/>
       <Notification message={message} />
       {user === null ?
         <div>
@@ -170,7 +168,6 @@ const Notification = ({ message }) => {
 
 const PostList = ({ posts, onLike, onDelete, user }) => {
 
-
   const rows = posts.map(post =>
     <div key={post.id}>
       <Post
@@ -186,31 +183,6 @@ const PostList = ({ posts, onLike, onDelete, user }) => {
       <h3>Posts</h3>
       {rows}
     </div>
-  )
-}
-
-const Post = ({ post, user, onLike, onDelete }) => {
-
-  const deleteButton = (post, user) => {
-
-    if (user && post.user && user.username === post.user.username) {
-      return <button onClick={onDelete}>delete me</button>
-    }
-
-    return null
-  }
-
-  return (
-    <TogglableHeader headerText={`${post.title} by ${post.author}`}>
-      <p>
-        {post.url === '' && <>{post.url}<br /></>}
-        {post.likes} likes <button onClick={onLike}>Like!</button><br />
-        Author: {post.author}<br />
-        Added by user: {post.user && post.user.username}<br />
-        {deleteButton(post, user)}
-      </p>
-    </TogglableHeader>
-
   )
 }
 
