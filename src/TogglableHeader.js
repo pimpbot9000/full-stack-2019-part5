@@ -1,5 +1,8 @@
 import React, { useState, useImperativeHandle } from 'react'
+import PropTypes from 'prop-types'
 
+
+// eslint-disable-next-line react/display-name
 const TogglableHeader = React.forwardRef((props, ref) => {
   const [visible, setVisible] = useState(false)
 
@@ -23,15 +26,19 @@ const TogglableHeader = React.forwardRef((props, ref) => {
   return (
 
     <div>
-      <h4 onClick={toggleVisibility}>{props.header}</h4>
+      <h4 onClick={toggleVisibility}>{props.headerText}</h4>
       <div style={visibility}>
         <div style={style}>
-        {props.children}
+          {props.children}
         </div>
       </div>
     </div>
-    
+
   )
 })
+
+TogglableHeader.propTypes = {
+  headerText: PropTypes.string.isRequired
+}
 
 export default TogglableHeader

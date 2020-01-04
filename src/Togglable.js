@@ -1,5 +1,6 @@
 import React, { useState, useImperativeHandle } from 'react'
 
+// eslint-disable-next-line react/display-name
 const Togglable = React.forwardRef((props, ref) => {
   const [visible, setVisible] = useState(false)
 
@@ -25,7 +26,7 @@ const Togglable = React.forwardRef((props, ref) => {
         <div className="togglable">
           {props.children}
         </div>
-        <button onClick={toggleVisibility}>{props.closeButtonLabel? props.closeButtonLabel: 'cancel'}</button>
+        <button onClick={toggleVisibility}>{props.closeButtonLabel ? props.closeButtonLabel : 'cancel'}</button>
       </div>
     </div>
   )

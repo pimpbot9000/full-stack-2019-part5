@@ -38,14 +38,14 @@ const App = () => {
   }, [])
 
   const showErrorMessage = message => {
-    setMessage({ type: "error", content: message })
+    setMessage({ type: 'error', content: message })
     setTimeout(() => {
       setMessage(null)
     }, 2000)
   }
 
   const showNotification = message => {
-    setMessage({ type: "notification", content: message })
+    setMessage({ type: 'notification', content: message })
     setTimeout(() => {
       setMessage(null)
     }, 2000)
@@ -109,18 +109,16 @@ const App = () => {
 
   const deletePost = async (id) => {
     const ok = window.confirm('Are you sure??')
-    if(!ok) return 
+    if(!ok) return
 
     try {
-      
+
       await postsService.remove(id)
-      
       setPosts(posts.filter(post => post.id !== id))
 
-    } catch(exception) {      
+    } catch(exception) {
       showErrorMessage('unable to delete post')
     }
-    
   }
 
   const like = async (id) => {
@@ -181,12 +179,11 @@ const PostList = ({ posts, onLike, onDelete, user }) => {
     return null
   }
 
-
   const rows = posts.map(item =>
     <div key={item.id}>
-      <TogglableHeader header={`${item.title} by ${item.author}`}>
+      <TogglableHeader headerText={`${item.title} by ${item.author}`}>
         <p>
-          {item.url} <br />
+          {item.url === '' && <>{item.url}<br/></>}
           {item.likes} likes <button onClick={() => onLike(item.id)}>Like!</button><br />
           Author: {item.author}<br />
           Added by user: {item.user && item.user.username}<br />
@@ -246,4 +243,4 @@ const LoginForm = ({ username, onUsernameChanged, password, onPasswordChanged, o
       <button type="submit">login</button>
     </form>
   </div>
-export default App;
+export default App
