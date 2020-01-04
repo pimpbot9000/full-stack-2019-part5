@@ -109,14 +109,14 @@ const App = () => {
 
   const deletePost = async (id) => {
     const ok = window.confirm('Are you sure??')
-    if(!ok) return
+    if (!ok) return
 
     try {
 
       await postsService.remove(id)
       setPosts(posts.filter(post => post.id !== id))
 
-    } catch(exception) {
+    } catch (exception) {
       showErrorMessage('unable to delete post')
     }
   }
@@ -170,35 +170,47 @@ const Notification = ({ message }) => {
 
 const PostList = ({ posts, onLike, onDelete, user }) => {
 
-  const deleteButton = (post, user) => {
 
-    if (user && post.user && user.username === post.user.username) {
-      return <button onClick={() => onDelete(post.id)}>delete me</button>
-    }
-
-    return null
-  }
-
-  const rows = posts.map(item =>
-    <div key={item.id}>
-      <TogglableHeader headerText={`${item.title} by ${item.author}`}>
-        <p>
-          {item.url === '' && <>{item.url}<br/></>}
-          {item.likes} likes <button onClick={() => onLike(item.id)}>Like!</button><br />
-          Author: {item.author}<br />
-          Added by user: {item.user && item.user.username}<br />
-          {deleteButton(item, user)}
-        </p>
-      </TogglableHeader>
+  const rows = posts.map(post =>
+    <div key={post.id}>
+      <Post
+        post={post}
+        user={user}
+        onLike={() => onLike(post.id)}
+        onDelete={() => onDelete(post.id)} />
     </div>
   )
-
 
   return (
     <div>
       <h3>Posts</h3>
       {rows}
     </div>
+  )
+}
+
+const Post = ({ post, user, onLike, onDelete }) => {
+
+  const deleteButton = (post, user) => {
+
+    if (user && post.user && user.username === post.user.username) {
+      return <button onClick={onDelete}>delete me</button>
+    }
+
+    return null
+  }
+
+  return (
+    <TogglableHeader headerText={`${post.title} by ${post.author}`}>
+      <p>
+        {post.url === '' && <>{post.url}<br /></>}
+        {post.likes} likes <button onClick={onLike}>Like!</button><br />
+        Author: {post.author}<br />
+        Added by user: {post.user && post.user.username}<br />
+        {deleteButton(post, user)}
+      </p>
+    </TogglableHeader>
+
   )
 }
 
