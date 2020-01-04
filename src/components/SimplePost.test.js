@@ -1,7 +1,7 @@
 import React from 'react'
 import { render, fireEvent } from '@testing-library/react'
 import SimplePost from './SimplePost'
-import { prettyDOM } from '@testing-library/dom'
+// import { prettyDOM } from '@testing-library/dom'
 
 test('renders content', () => {
   const title = 'Component testing is done with react-testing-library'

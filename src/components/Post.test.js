@@ -1,7 +1,6 @@
 import React from 'react'
 import { render, fireEvent } from '@testing-library/react'
 import Post from './Post'
-import { prettyDOM } from '@testing-library/dom'
 
 /**
  * Togglability of <Post> is mostly covered by Togglableheader tests
