@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import loginService from './services/login'
 import postsService from './services/posts'
-import Togglable from './Togglable'
-import TogglableHeader from './TogglableHeader'
+import Togglable from './components/Togglable'
+import TogglableHeader from './components/TogglableHeader'
 
 const App = () => {
 
