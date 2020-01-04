@@ -3,46 +3,57 @@ import { render, fireEvent } from '@testing-library/react'
 import Post from './Post'
 import { prettyDOM } from '@testing-library/dom'
 
+/**
+ * Togglability of <Post> is mostly covered by Togglableheader tests
+ */
+describe('<Post />', () => {
 
-test('renders content', () => {
-  const title = 'Component testing is done with react-testing-library'
-  const author = 'Dijkstra'
-  const post = {
-    title, author
-  }
-
-  const component = render(
-    <Post post={post} />
-  )
-
-  const p = component.container.querySelector('p')
-
-  console.log(prettyDOM(p))
-
-  expect(component.container).toHaveTextContent(
-    `${title} by ${author}`
-  )
-})
-
-test('clicking the like button fires once the callback', () => {
-
+  let component
+  let mockHandler
   const title = 'title'
   const author = 'author'
   const post = {
-    title, author
+    title, author,
+    user: {
+      username: 'username'
+    }
   }
 
-  const mockHandler = jest.fn()
+  const user = {
+    username: 'username'
+  }
 
-  const component = render(
-    <Post post={post} onLike={mockHandler} />
-  )
+  beforeEach(() => {
+    mockHandler = jest.fn()
+    component = render(
+      <Post post={post} onLike={mockHandler} onDelete={mockHandler} user={user}/>
+    )
+  })
 
-  const header = component.getByText(`${title} by ${author}`)
-  const button = component.getByText('Like!')
+  test('renders content', () => {
+    expect(component.container).toHaveTextContent(
+      `${title} by ${author}`
+    )
+  })
 
-  fireEvent.click(header)  //click header to open
-  fireEvent.click(button)
+  test('clicking the like button twice fires the callback twice', () => {
 
-  expect(mockHandler.mock.calls.length).toBe(1)
+    const button = component.getByText('Like!')
+    fireEvent.click(button)
+    fireEvent.click(button)
+    expect(mockHandler.mock.calls.length).toBe(2)
+
+  })
+
+  test('delete button exists', () => {
+    component.getByText('delete me')
+  })
+
+  test('clicking the delete button fires the callback', () => {
+
+    const button = component.getByText('delete me')
+    fireEvent.click(button)
+    expect(mockHandler.mock.calls.length).toBe(1)
+
+  })
 })

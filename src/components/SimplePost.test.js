@@ -39,7 +39,5 @@ test('clicking the button fires the onLike once', () => {
 
   fireEvent.click(button)
 
-  console.log(prettyDOM(button))
-
   expect(mockHandler.mock.calls.length).toBe(1)
 })

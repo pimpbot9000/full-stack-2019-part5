@@ -7,10 +7,16 @@ describe('<TogglableHeader />', () => {
 
   beforeEach(() => {
     component = render(
-      <TogglableHeader headerText="show">
-        <div className="testDiv" />
+      <TogglableHeader headerText='show'>
+        <div className='testDiv' />
       </TogglableHeader>
     )
+  })
+
+  test('renders the header', () => {
+    const h4 = component.container.querySelector('h4')
+    expect(h4).toHaveTextContent('show')
+
   })
 
   test('renders its children', () => {

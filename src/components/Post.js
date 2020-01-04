@@ -13,6 +13,7 @@ const Post = ({ post, user, onLike, onDelete }) => {
   }
 
   return (
+
     <TogglableHeader headerText={`${post.title} by ${post.author}`}>
       <p>
         {post.likes} likes <button onClick={onLike}>Like!</button><br />
