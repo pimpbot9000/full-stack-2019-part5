@@ -26,8 +26,8 @@ const TogglableHeader = React.forwardRef((props, ref) => {
   return (
 
     <div>
-      <h4 onClick={toggleVisibility}>{props.headerText}</h4>
-      <div style={visibility}>
+      <h4 onClick={toggleVisibility} >{props.headerText}</h4>
+      <div style={visibility} className="togglableContent">
         <div style={style}>
           {props.children}
         </div>

@@ -24,21 +24,25 @@ test('renders content', () => {
   )
 })
 
-test('clicking the header opens shit up', () => {
+test('clicking the like button fires once the callback', () => {
 
-  const title = 'Component testing is done with react-testing-library'
-  const author = 'Dijkstra'
+  const title = 'title'
+  const author = 'author'
   const post = {
     title, author
   }
 
+  const mockHandler = jest.fn()
+
   const component = render(
-    <Post post={post} />
+    <Post post={post} onLike={mockHandler} />
   )
 
-  const header = component.container.querySelector('h4')
+  const header = component.getByText(`${title} by ${author}`)
+  const button = component.getByText('Like!')
 
-  console.log(prettyDOM(header))
+  fireEvent.click(header)  //click header to open
+  fireEvent.click(button)
 
-
+  expect(mockHandler.mock.calls.length).toBe(1)
 })
