@@ -3,7 +3,7 @@ import loginService from './services/login'
 import postsService from './services/posts'
 import Togglable from './components/Togglable'
 import Post from './components/Post'
-import MathBlock from './components/MathBlock'
+import PostForm from './components/PostForm'
 
 const App = () => {
 
@@ -24,6 +24,7 @@ const App = () => {
           setPosts(posts.sort((a, b) => b.likes - a.likes))
         })
     }
+
   }, [user])
 
   useEffect(() => {
@@ -84,7 +85,7 @@ const App = () => {
         onTitleChanged={({ target }) => setTitle(target.value)}
         url={url}
         onUrlChanged={({ target }) => setUrl(target.value)}
-        onSubmitPost={submitPost} />
+        onSubmit={submitPost} />
     </Togglable>
   )
 
@@ -127,22 +128,21 @@ const App = () => {
     }
   }
 
-  const math = 'f(x) = \\alpha\\cdot 5'
   return (
-    <div className="App">
-      <MathBlock text={math}/>
+    <div className='App'>
+
       <Notification message={message} />
       {user === null ?
         <div>
-          <Togglable buttonLabel="Show Login">
-            <LoginForm
-              username={username}
-              onUsernameChanged={({ target }) => setUsername(target.value)}
-              password={password}
-              onPasswordChanged={({ target }) => setPassword(target.value)}
-              onLogin={onLogin}
-            />
-          </Togglable>
+
+          <LoginForm
+            username={username}
+            onUsernameChanged={({ target }) => setUsername(target.value)}
+            password={password}
+            onPasswordChanged={({ target }) => setPassword(target.value)}
+            onLogin={onLogin}
+          />
+
         </div>
 
         : //user not null -> render posts
@@ -169,7 +169,7 @@ const Notification = ({ message }) => {
 const PostList = ({ posts, onLike, onDelete, user }) => {
 
   const rows = posts.map(post =>
-    <div key={post.id}>
+    <div key={post.id} className='post'>
       <Post
         post={post}
         user={user}
@@ -185,21 +185,6 @@ const PostList = ({ posts, onLike, onDelete, user }) => {
     </div>
   )
 }
-
-const PostForm = ({ title, onTitleChanged, url, onUrlChanged, onSubmitPost }) =>
-
-  <form onSubmit={onSubmitPost}>
-    <h1>Create new post</h1>
-    <div>
-      <p>Title:</p>
-      <input type="text" value={title} name="title" onChange={onTitleChanged} />
-    </div>
-    <div>
-      <p>Url:</p>
-      <input type="text" value={url} name="url" onChange={onUrlChanged} />
-    </div>
-    <button type="submit">Save</button>
-  </form>
 
 const LoginForm = ({ username, onUsernameChanged, password, onPasswordChanged, onLogin }) =>
   <div>
