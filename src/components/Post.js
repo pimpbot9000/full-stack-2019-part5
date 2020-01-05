@@ -1,5 +1,7 @@
 import React from 'react'
 import TogglableHeader from './TogglableHeader'
+import MathBlock from './MathBlock'
+import Latex from './Latex'
 
 const Post = ({ post, user, onLike, onDelete }) => {
 
@@ -13,16 +15,21 @@ const Post = ({ post, user, onLike, onDelete }) => {
   }
 
   return (
+    <Latex>
+      <p>{post.title}</p>
+      <TogglableHeader headerText={`${post.title} by ${post.author}`}>
+        <p>
+          {post.likes} likes <button onClick={onLike}>Like!</button><br />
+          Author: {post.author}<br />
+          Added by user: {post.user && post.user.username}<br />
+          {post.url && post.url !== '' && <>{post.url}<br /></>}
+          {deleteButton(post, user)}
+        </p>
 
-    <TogglableHeader headerText={`${post.title} by ${post.author}`}>
-      <p>
-        {post.likes} likes <button onClick={onLike}>Like!</button><br />
-        Author: {post.author}<br />
-        Added by user: {post.user && post.user.username}<br />
-        {post.url && post.url !== '' && <>{post.url}<br /></>}
-        {deleteButton(post, user)}
-      </p>
-    </TogglableHeader>
+        <p>{post.text}</p>
+
+      </TogglableHeader>
+    </Latex>
 
   )
 }
