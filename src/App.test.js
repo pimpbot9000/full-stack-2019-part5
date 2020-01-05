@@ -15,8 +15,9 @@ describe('<App />', () => {
     await waitForElement(
       () => component.getByText('Login')
     )
-    const username = component.container.querySelector('[name="Username"]')
-    const password = component.container.querySelector('[name="Password"]')
+
+    const username = component.container.querySelector('[name="username"]')
+    const password = component.container.querySelector('[name="password"]')
     expect(username).not.toBe(null)
     expect(password).not.toBe(null)
   })

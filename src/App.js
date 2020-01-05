@@ -4,17 +4,20 @@ import postsService from './services/posts'
 import Togglable from './components/Togglable'
 import Post from './components/Post'
 import PostForm from './components/PostForm'
+import { useField } from './hooks'
 
 const App = () => {
 
   const loggedInUserKey = 'loggedInuser'
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+  const username = useField('text', 'username')
+  const password = useField('password', 'password')
   const [title, setTitle] = useState('')
   const [url, setUrl] = useState('')
   const [message, setMessage] = useState(null)
   const [user, setUser] = useState(null)
   const [posts, setPosts] = useState([])
+
+  const postFormRef = React.createRef()
 
   useEffect(() => {
     if (user) {
@@ -50,18 +53,20 @@ const App = () => {
     }, 2000)
   }
 
-  const onLogin = async event => {
-    event.preventDefault()
+  const onLogin = async () => {
 
     try {
-      const loggedInUser = await loginService.login({
-        username, password,
-      })
+      const loggedInUser = await loginService.login(
+        {
+          username: username.value,
+          password: password.value
+        }
+      )
 
       window.localStorage.setItem(loggedInUserKey, JSON.stringify(loggedInUser))
       setUser(loggedInUser)
-      setUsername('')
-      setPassword('')
+      username.clearValue()
+      password.clearValue()
       postsService.setToken(loggedInUser.token)
 
     } catch (exception) {
@@ -75,8 +80,6 @@ const App = () => {
     setUser(null)
     setPosts([])
   }
-
-  const postFormRef = React.createRef()
 
   const postForm = () => (
     <Togglable buttonLabel="Create post" ref={postFormRef}>
@@ -136,11 +139,9 @@ const App = () => {
         <div>
 
           <LoginForm
-            username={username}
-            onUsernameChanged={({ target }) => setUsername(target.value)}
-            password={password}
-            onPasswordChanged={({ target }) => setPassword(target.value)}
             onLogin={onLogin}
+            username={username}
+            password={password}
           />
 
         </div>
@@ -186,30 +187,36 @@ const PostList = ({ posts, onLike, onDelete, user }) => {
   )
 }
 
-const LoginForm = ({ username, onUsernameChanged, password, onPasswordChanged, onLogin }) =>
-  <div>
-    <h2>Login</h2>
-    <form onSubmit={onLogin}>
-      <div>
-        <p>Username</p>
-        <input
-          type="text"
-          value={username}
-          name="Username"
-          onChange={onUsernameChanged}
-        />
-      </div>
-      <div>
-        <p>Password</p>
-        <input
-          type="password"
-          value={password}
-          name="Password"
-          onChange={onPasswordChanged}
-        />
-      </div>
-      <br />
-      <button type="submit">login</button>
-    </form>
-  </div>
+
+const LoginForm = ({ username, password, onLogin }) => {
+
+
+  const login = (event) => {
+    event.preventDefault()
+    onLogin()
+  }
+
+
+  return (
+    <div>
+      <h2>Login</h2>
+      <form onSubmit={login}>
+        <div>
+          <p>Username</p>
+          <input
+            {...username.attributes}
+          />
+        </div>
+        <div>
+          <p>Password</p>
+          <input
+            {...password.attributes}
+          />
+        </div>
+        <br />
+        <button type="submit">login</button>
+      </form>
+    </div>)
+}
+
 export default App
